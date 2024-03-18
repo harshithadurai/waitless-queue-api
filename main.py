@@ -59,7 +59,7 @@ def join_queue(machine_id: str, user_id: str):
     # if user_id in user_queues and len(user_queues[user_id]) >= 5:
     #     raise HTTPException(status_code=403, detail="You cannot join more than 5 queues.")
 
-    if machine_id not in user_queues[user_id]: # if user is alr in queue for machine_id
+    if machine_id not in user_queues[user_id]: # if user is not alr in queue for machine_id
         machine_queues[machine_id].add(user_id)
         if user_id not in user_queues:
             user_queues[user_id] = []
@@ -69,7 +69,7 @@ def join_queue(machine_id: str, user_id: str):
     return {"message": "You have successfully joined the queue for machine {}".format(machine_id)}
 
 # user_id exits queue for machine_id
-@app.delete("/leave/{machine_id}/{user_id}")
+@app.post("/leave/{machine_id}/{user_id}")
 def leave_queue(machine_id: str, user_id: str):
 
     if user_id not in users:
@@ -106,6 +106,21 @@ def get_user_queue_count(user_id: str):
     
     printUsers()
     return {"count": len(user_queues[user_id]), "queues": user_queues[user_id]}
+
+# user_id exits the queue for all machines
+@app.post("/leave_all/{user_id}")
+def leave_queue(user_id: str):
+
+    if user_id not in users:
+        raise HTTPException(status_code=400, detail="User does not exist")
+    
+    for machine in user_queues[user_id]:
+        machine_queues[machine].remove(user_id)
+
+    user_queues[user_id] = []
+
+    printUsers()
+    return {"message": "You have successfully left all queues"}
 
 
 def printUsers():

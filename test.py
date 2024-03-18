@@ -3,10 +3,13 @@ import requests
 # Base URL of the FastAPI server
 base_url = "http://localhost:8000"
 
+# response = requests.post(f"{base_url}/add_user/{user}")
+
 # Add users
 users = ["1234", "5678", "9012"]
 for user in users:
     response = requests.post(f"{base_url}/add_user/{user}")
+    print(f"{base_url}/add_user/{user}")
     print(response.json())
 
 # Join queues
