@@ -2,7 +2,23 @@ from fastapi import FastAPI, HTTPException
 
 app = FastAPI()
 
-machines = ["Treadmill", "Stationarybike", "Ellipticaltrainer", "Rowingmachine", "Smith machine", "Legpressmachine", "Chestpress", "Latpulldownmachine", "Legextensionmachine", "Legcurlmachine", "Seatedcalfraisemachine", "Cablecrossovermachine", "Shoulderpressmachine", "Dumbbellrack", "Adjustablebench", "Abdominalcrunchmachine", "Hipabduction", "Assistedpull-up", "Smithmachine", "Hacksquatmachine"]
+machine_data = {
+    1: "Treadmill",
+    4: "Shoulder Press",
+    5: "Leg Press",
+    6: "Hip Abductor",
+    7: "Hip Adductor",
+    8: "Calf Raises",
+    9: "Leg Extension",
+    10: "Lat Pulldown",
+    11: "Assisted Pull-up",
+    12: "Barbell Bench Press",
+    13: "Seated Cable Rows",
+    14: "Machine Fly"
+}
+
+
+machines = ["Treadmill", "Stationarybike", "Ellipticaltrainer", "Rowingmachine", "Smith machine", "Legpressmachine", "Chestpress", "Latpulldownmachine", "Legextensionmachine", "Legcurlmachine", "Seatedcalfraisemachine", "Cablecrossovermachine", "Shoulderpressmachine", "Dumbbellrack", "Adjustablebench", "Abdominalcrunchmachine", "Hipabduction", "Assistedpull-up", "Smithmachine", "Hacksquatmachine", "Squatrack"]
 
 machine_queues = {} # Queues for each machine. key=machine_id value=set of users
 
@@ -11,8 +27,8 @@ user_queues = {} # Users and their respective queues. key=user_id value=list of 
 users = set() # Set of current users (UW student ids)
 
 # Initialize machine_queues
-for machine in machines:
-    machine_queues[machine] = set()
+for machine_id, _ in machine_data.items():
+    machine_queues[machine_id] = set()
 
 @app.get("/")
 def lol():
@@ -50,7 +66,7 @@ def join_queue(user_id: str):
 
 # user_id joins queue for machine_id
 @app.post("/join/{machine_id}/{user_id}")
-def join_queue(machine_id: str, user_id: str):
+def join_queue(machine_id: int, user_id: str):
 
     if user_id not in users:
         raise HTTPException(status_code=401, detail="User does not exist")
@@ -70,7 +86,7 @@ def join_queue(machine_id: str, user_id: str):
 
 # user_id exits queue for machine_id
 @app.post("/leave/{machine_id}/{user_id}")
-def leave_queue(machine_id: str, user_id: str):
+def leave_queue(machine_id: int, user_id: str):
 
     if user_id not in users:
         raise HTTPException(status_code=400, detail="User does not exist")
@@ -87,7 +103,7 @@ def leave_queue(machine_id: str, user_id: str):
 
 # returns the number of people in queue for machine_id
 @app.get("/waiting/{machine_id}")
-def get_queue_count(machine_id: str):
+def get_queue_count(machine_id: int):
 
     if machine_id not in machine_queues:
         raise HTTPException(status_code=404, detail="Machine {} not found".format(machine_id))
@@ -114,8 +130,8 @@ def leave_queue(user_id: str):
     if user_id not in users:
         raise HTTPException(status_code=400, detail="User does not exist")
     
-    for machine in user_queues[user_id]:
-        machine_queues[machine].remove(user_id)
+    for machine_id in user_queues[user_id]:
+        machine_queues[machine_id].remove(user_id)
 
     user_queues[user_id] = []
 
